@@ -21,6 +21,28 @@ const OFFERS = [
       },
     ],
   },
+   {
+    id: 2,
+    title: "Post-Purchase Offer -- 2",
+    productTitle: "Floral White Top - 2",
+    productImageURL:
+      "",
+    productDescription: ["Stylish sleeveless white top with a floral pattern."],
+    originalPrice: "75.00",
+    discountedPrice: "63.75",
+    changes: [
+      {
+        type: "add_variant",
+        variantID: 50390913351968,
+        quantity: 1,
+        discount: {
+          value: 15,
+          valueType: "percentage",
+          title: "15% off",
+        },
+      },
+    ],
+  },
 ];
 
 

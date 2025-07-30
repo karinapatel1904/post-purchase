@@ -13,7 +13,7 @@ import {
   Layout,
 } from "@shopify/post-purchase-ui-extensions";
 
-const APP_URL = "https://carol-using-enormous-loose.trycloudflare.com";
+const APP_URL = "https://thin-antarctica-cached-cingular.trycloudflare.com";
 
 
 // ShouldRender - fetch offer from backend
@@ -24,7 +24,6 @@ extend("Checkout::PostPurchase::ShouldRender", async ({ inputData, storage }) =>
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         referenceId: inputData.initialPurchase.referenceId,
-        token: inputData.token,
       }),
     });
 
@@ -66,12 +65,16 @@ extend(
       return;
     }
 
-    const offer = storage.initialData.offers[0];
-    console.log('Selected offer:', offer);
+    // const offer = storage.initialData.offers[0];
+    const offers = storage.initialData.offers || [];
+
+    console.log('Selected offers:', offers);
 
     // Handler to accept the offer and add to order
     
-    async function acceptOffer() {
+    async function acceptOffer(offer) {
+      console.log('Selected offer:', offer);
+
       try {
         console.log("🔧 Starting changeset calculation...");
 
@@ -91,7 +94,6 @@ extend(
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${inputData.token}`,
           },
           body: JSON.stringify(requestBody),
         });
@@ -121,15 +123,48 @@ extend(
   }
 
 
-    // Render the offer UI
-    root.appendChild(
-      root.createComponent(BlockStack, { spacing: "loose" }, [
-        root.createComponent(Heading, {}, "Special Offer"),
-        root.createComponent(Text, {}, `Add ${offer.productTitle} to your order for ${offer.discountedPrice}?`),
-        root.createComponent(Button, { onPress: acceptOffer }, "Accept Offer"),
-        root.createComponent(Button, { onPress: acceptOffer }, "Add to Order"),
-        root.createComponent(Button, { onPress: done, subdued: true }, "Decline"),
-      ])
+     const mainContainer = root.createComponent(BlockStack, { spacing: "loose" });
+    
+    // Add heading for all offers
+    mainContainer.appendChild(
+      root.createComponent(Heading, {}, "Special Offers")
     );
+
+    // Loop through all offers and create UI for each
+    for (let i = 0; i < offers.length; i++) {
+      const offer = offers[i];
+      console.log(`Processing offer ${i + 1}:`, offer);
+
+      // Create offer container
+      const offerContainer = root.createComponent(BlockStack, { spacing: "tight" });
+      
+      // Add offer content
+      offerContainer.appendChild(
+        root.createComponent(Text, {}, `Add ${offer.productTitle} to your order for ${offer.discountedPrice}?`)
+      );
+      
+      // Add buttons for this offer
+      const buttonContainer = root.createComponent(BlockStack, { spacing: "tight" });
+      buttonContainer.appendChild(
+        root.createComponent(Button, { onPress: () => acceptOffer(offer) }, "Add to Order")
+      );
+      buttonContainer.appendChild(
+        root.createComponent(Button, { onPress: done, subdued: true }, "Decline")
+      );
+      
+      offerContainer.appendChild(buttonContainer);
+      
+      // Add separator between offers (except for the last one)
+      if (i < offers.length - 1) {
+        offerContainer.appendChild(
+          root.createComponent(Separator, {})
+        );
+      }
+      
+      mainContainer.appendChild(offerContainer);
+    }
+
+    // Add the main container to the root
+    root.appendChild(mainContainer);
   }
 );
