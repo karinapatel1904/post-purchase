@@ -4,7 +4,7 @@ const OFFERS = [
     title: "Post-Purchase Offer",
     productTitle: "Floral White Top",
     productImageURL:
-      "",
+      "https://cdn.shopify.com/s/files/1/0942/0806/5824/files/city-woman-fashion_925x_2x_9d443e4d-9309-43cd-b4e0-d2fa0750910f.jpg?v=1751611408",
     productDescription: ["Stylish sleeveless white top with a floral pattern."],
     originalPrice: "75.00",
     discountedPrice: "63.75",
@@ -26,7 +26,7 @@ const OFFERS = [
     title: "Post-Purchase Offer -- 2",
     productTitle: "Floral White Top - 2",
     productImageURL:
-      "",
+      "https://cdn.shopify.com/s/files/1/0942/0806/5824/files/city-woman-fashion_925x_2x_9d443e4d-9309-43cd-b4e0-d2fa0750910f.jpg?v=1751611408",
     productDescription: ["Stylish sleeveless white top with a floral pattern."],
     originalPrice: "75.00",
     discountedPrice: "63.75",

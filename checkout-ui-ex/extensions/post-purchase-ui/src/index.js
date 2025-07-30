@@ -1,6 +1,7 @@
 import {
   extend,
   BlockStack,
+  InlineStack,
   Button,
   CalloutBanner,
   Heading,
@@ -13,7 +14,7 @@ import {
   Layout,
 } from "@shopify/post-purchase-ui-extensions";
 
-const APP_URL = "https://thin-antarctica-cached-cingular.trycloudflare.com";
+const APP_URL = "https://proxy-train-vegetable-apnic.trycloudflare.com";
 
 
 // ShouldRender - fetch offer from backend
@@ -122,49 +123,91 @@ extend(
       }
   }
 
+  const mainContainer = root.createComponent(BlockStack, {
+    spacing: "loose",
+    maxInlineSize: "1/1", // closest to 100% width
+    padding: "base",      // "base" = Shopify’s built-in spacing unit
+    alignment: "center"
+  });
 
-     const mainContainer = root.createComponent(BlockStack, { spacing: "loose" });
-    
-    // Add heading for all offers
-    mainContainer.appendChild(
+  // Add heading for all offers
+  mainContainer.appendChild(
       root.createComponent(Heading, {}, "Special Offers")
     );
 
-    // Loop through all offers and create UI for each
+    const cardGroup = root.createComponent(InlineStack, {
+      spacing: 'base',
+      wrap: true,            // 💡 allow cards to wrap to new row
+      alignment: 'start',    // 💡 align cards to the top
+    });
+
     for (let i = 0; i < offers.length; i++) {
       const offer = offers[i];
-      console.log(`Processing offer ${i + 1}:`, offer);
 
-      // Create offer container
-      const offerContainer = root.createComponent(BlockStack, { spacing: "tight" });
-      
-      // Add offer content
-      offerContainer.appendChild(
-        root.createComponent(Text, {}, `Add ${offer.productTitle} to your order for ${offer.discountedPrice}?`)
+      const cardContainer = root.createComponent(BlockStack, {
+        spacing: 'loose',
+        padding: '20px',
+        borderWidth: 'medium',         // Already present
+        borderColor: 'base',           // Add this line for border color
+        borderStyle: 'solid',          // Optional, if supported by the framework
+        cornerRadius: 'large',         // Updated from 'medium' for more visible rounding
+        background: 'surface',
+        maxInlineSize: '50%',
+      });
+
+      // IMAGE
+      const productImage = root.createComponent(Image, {
+        source: offer.productImageURL || 'https://via.placeholder.com/400x300',
+        description: offer.productTitle,
+        borderRadius: 'base',
+      });
+
+      // TITLE
+      const title = root.createComponent(Heading, { level: 2 }, offer.productTitle);
+
+      // DESCRIPTION
+      const description = root.createComponent(Text, {}, `Add this to your order for ${offer.discountedPrice}?`);
+
+      // BUTTONS
+      const buttonGroup = root.createComponent(InlineStack, { spacing: 'base' });
+
+      const addButton = root.createComponent(
+        Button,
+        {
+          onPress: () => acceptOffer(offer),
+          kind: 'primary',
+        },
+        'Add to Order'
       );
-      
-      // Add buttons for this offer
-      const buttonContainer = root.createComponent(BlockStack, { spacing: "tight" });
-      buttonContainer.appendChild(
-        root.createComponent(Button, { onPress: () => acceptOffer(offer) }, "Add to Order")
+
+      const declineButton = root.createComponent(
+        Button,
+        {
+          onPress: done,
+          kind: 'secondary',
+        },
+        'Decline'
       );
-      buttonContainer.appendChild(
-        root.createComponent(Button, { onPress: done, subdued: true }, "Decline")
-      );
+
+      buttonGroup.appendChild(addButton);
+      buttonGroup.appendChild(declineButton);
+
+      // Assemble Card
+      cardContainer.appendChild(productImage);
+      cardContainer.appendChild(title);
+      cardContainer.appendChild(description);
+      cardContainer.appendChild(buttonGroup);
+
       
-      offerContainer.appendChild(buttonContainer);
+      cardGroup.appendChild(cardContainer);
       
-      // Add separator between offers (except for the last one)
-      if (i < offers.length - 1) {
-        offerContainer.appendChild(
-          root.createComponent(Separator, {})
-        );
-      }
-      
-      mainContainer.appendChild(offerContainer);
     }
 
-    // Add the main container to the root
+
+      mainContainer.appendChild(
+        root.createComponent(BlockStack, { spacing: 'loose' }, [cardGroup])
+      );
+
     root.appendChild(mainContainer);
   }
 );
